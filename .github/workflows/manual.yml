@@ -7,6 +7,10 @@ on:
     types: [ closed ]
   workflow_dispatch:
 
+# Future-proof the runner against the Node 20 deprecation
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
 jobs:
   deploy:
     # Only run if the PR was actually merged, not just closed without merging
@@ -23,8 +27,9 @@ jobs:
     - name: Setup Node.js
       uses: actions/setup-node@v4
       with:
-        node-node-version: '20' # Match your local Node version
+        node-version: '20' # Match your local Node version
         cache: 'npm'
+        cache-dependency-path: ./aboutme/package-lock.json
 
     - name: Install dependencies & Build Frontend
       run: |
