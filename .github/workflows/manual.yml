@@ -1,0 +1,65 @@
+name: Personal Website Build and Deploy
+
+# Step 1: Trigger only when a PR is merged into the main branch
+on:
+  pull_request:
+    branches: [ main ]
+    types: [ closed ]
+
+jobs:
+  deploy:
+    # Only run if the PR was actually merged, not just closed without merging
+    if: github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+
+    steps:
+    # --------------------------------------------------------
+    # Setup & Frontend Build
+    # --------------------------------------------------------
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-node-version: '20' # Match your local Node version
+        cache: 'npm'
+
+    - name: Install dependencies & Build Frontend
+      run: |
+        cd aboutme # Change to your frontend directory if applicable
+        npm ci
+        npm run build
+      # This generates your frontend artifact (e.g., a 'dist' or 'build' folder)
+
+    - name: Log in to Container Registry
+      uses: docker/login-action@v3
+      with:
+        registry: ghcr.io
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
+
+    # --------------------------------------------------------
+    # Step 3: Build Backend Container (Injecting Frontend)
+    # --------------------------------------------------------
+    - name: Build and Push Docker Image
+      uses: docker/build-push-action@v5
+      with:
+        context: . # Your build context. Dockerfile should handle copying the frontend folder
+        file: ./aboutme_backend/Dockerfile # Path to your Dockerfile
+        push: true
+        tags: |
+          ghcr.io/${{ github.repository }}/marketing-site:latest
+          ghcr.io/${{ github.repository }}/marketing-site:${{ github.sha }}
+
+    # --------------------------------------------------------
+    # Step 4: Deploy to KTH Cloud
+    # --------------------------------------------------------
+    - name: Set up Kubeconfig
+      run: |
+        mkdir -p ~/.kube
+        echo "${{ secrets.KTH_KUBECONFIG }}" > ~/.kube/config
+
+    - name: Trigger KTH Cloud Deployment
+      run: |
+        kubectl rollout restart deployment/vc_about_me
