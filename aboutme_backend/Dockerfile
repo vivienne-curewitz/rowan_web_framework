@@ -4,6 +4,8 @@ WORKDIR /app
 COPY aboutme_backend/go.mod ./
 RUN go mod download
 COPY aboutme_backend/. .
+RUN mkdir frontend
+COPY aboutme/dist ./frontend/dist
 # Build the binary with static linking for Alpine
 RUN CGO_ENABLED=0 GOOS=linux go build -o main .
 
