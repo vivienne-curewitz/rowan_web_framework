@@ -18,7 +18,7 @@
       <section class="summary-section">
         <h2>Professional Summary</h2>
         <p>
-          I am an energetic and experienced Software Engineer with a passion for reliablility and
+          I am an energetic and experienced Software Engineer with a passion for reliability and
           sustainability. I aim to build a more sustainable future by creating software that is
           efficient, scalable, and environmentally conscious. With over 10 years of classical
           software development experience and constant pursuit of cutting edge agentic AI tools and
