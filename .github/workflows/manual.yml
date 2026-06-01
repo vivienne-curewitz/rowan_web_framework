@@ -54,3 +54,4 @@ jobs:
         context: . # Your build context. Dockerfile should handle copying the frontend folder
         file: ./aboutme_backend/Dockerfile # Path to your Dockerfile
         push: true
+        tags: ${{ secrets.KTH_DOCKER_TAG }}
