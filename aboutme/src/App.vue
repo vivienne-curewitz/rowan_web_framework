@@ -8,8 +8,8 @@
       <div class="profile-container">
         <img src="/IMG_2624.jpeg" alt="Profile Picture" class="profile-img" />
         <div class="header-text">
-          <h1>[Your Name]</h1>
-          <p class="tagline">[Professional Title | e.g., Senior Software Engineer]</p>
+          <h1>Vivienne Curewitz</h1>
+          <p class="tagline">Senior Software Engineer</p>
         </div>
       </div>
     </header>
@@ -18,8 +18,11 @@
       <section class="summary-section">
         <h2>Professional Summary</h2>
         <p>
-          [A brief, high-level overview of your professional background, core strengths, and what
-          drives you. This is your "elevator pitch" to potential employers or collaborators.]
+          I am an energetic and experienced Software Engineer with a passion for reliablility and
+          sustainability. I aim to build a more sustainable future by creating software that is
+          efficient, scalable, and environmentally conscious. With over 10 years of classical
+          software development experience and constant pursuit of cutting edge agentic AI tools and
+          techniques, I am well suited to help you move your organization into the future.
         </p>
       </section>
 
@@ -27,45 +30,40 @@
         <h2>Professional Capabilities</h2>
         <ul class="capabilities-list">
           <li>
-            <strong>[Capability 1]</strong>: [Brief description of your expertise and impact in this
-            area.]
+            <strong>Technical Leadership</strong>: Leadership is more than tracking KPIs, task
+            decomposition, and begging your workers to use AI. Leadership is developing a
+            relationship with your team and your customer; understanding needs, capabilities, and
+            motivations, and using that understanding to achieve mutually beneficial outcomes.
           </li>
           <li>
-            <strong>[Capability 2]</strong>: [Brief description of your expertise and impact in this
-            area.]
+            <strong>Software Architecture and Design</strong>: Software is not code. It is a living
+            and evolving system that exists in the context of developers, users, and hardware. Good
+            software is maintainable and extensible while being fast and efficient. It is intuitive
+            to use but enables complex controls and interactions. It is a journey, and design is
+            guiding that journey towards new features without compromising what already exists.
           </li>
           <li>
-            <strong>[Capability 3]</strong>: [Brief description of your expertise and impact in this
-            area.]
-          </li>
-          <li>
-            <strong>[Capability 4]</strong>: [Brief description of your expertise and impact in this
-            area.]
+            <strong>DevOps and Infrastructure</strong>: I design my software to be lightweight and
+            efficient, and so I must design my infrastructure to be equally efficient. I have
+            experience with Azure, AWS, and on-prem systems, and I am always looking for ways to
+            stretch compute further and reduce costs.
           </li>
         </ul>
       </section>
 
-      <section class="experience-section">
-        <h2>Key Achievements</h2>
-        <ul class="achievements-list">
-          <li>[Achievement 1: e.g., Led the migration of a legacy system to a modern microservices architecture.]</li>
-          <li>[Achievement 2: e.g., Developed a high-performance framework used by 50+ developers.]</li>
-          <li>[Achievement 3: e.g., Optimized database queries, reducing latency by 40%.]</li>
-        </ul>
-      </section>
     </main>
 
     <footer class="footer">
       <div class="links">
-        <a href="https://github.com/[your-username]" target="_blank" rel="noopener" class="link">
+        <a href="https://github.com/vivienne-curewitz"" target="_blank" rel="noopener" class="link">
           GitHub
         </a>
         <span class="separator">|</span>
-        <a href="https://linkedin.com/in/[your-username]" target="_blank" rel="noopener" class="link">
+        <a href="https://www.linkedin.com/in/vivienne-curewitz/" target="_blank" rel="noopener" class="link">
           LinkedIn
         </a>
       </div>
-      <p class="copyright">&copy; {{ new Date().getFullYear() }} [Your Name]</p>
+      <p class="copyright">&copy; {{ new Date().getFullYear() }} Vivienne Curewitz</p>
     </footer>
   </div>
 </template>
@@ -73,12 +71,13 @@
 <style>
 body {
   margin: 0;
-  background-image: url('/rowan_tree.jpg');
+  background-image: url('/birch-tree-clipart-lg.png');
   background-size: cover;
   background-position: center;
   background-attachment: fixed;
   background-repeat: no-repeat;
   min-height: 100vh;
+  background-color: #f0f4f0; /* Light green-grey fallback */
 }
 </style>
 
