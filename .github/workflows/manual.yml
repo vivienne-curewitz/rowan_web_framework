@@ -5,6 +5,7 @@ on:
   pull_request:
     branches: [ main ]
     types: [ closed ]
+  workflow_dispatch:
 
 jobs:
   deploy:
@@ -35,9 +36,9 @@ jobs:
     - name: Log in to Container Registry
       uses: docker/login-action@v3
       with:
-        registry: ghcr.io
-        username: ${{ github.actor }}
-        password: ${{ secrets.GITHUB_TOKEN }}
+        registry: registry.cloud.cbh.kth.se
+        username: ${{ secrets.KTH_DOCKER_USERNAME }}
+        password: ${{ secrets.KTH_DOCKER_PASSWORD }}
 
     # --------------------------------------------------------
     # Step 3: Build Backend Container (Injecting Frontend)
@@ -48,18 +49,3 @@ jobs:
         context: . # Your build context. Dockerfile should handle copying the frontend folder
         file: ./aboutme_backend/Dockerfile # Path to your Dockerfile
         push: true
-        tags: |
-          ghcr.io/${{ github.repository }}/marketing-site:latest
-          ghcr.io/${{ github.repository }}/marketing-site:${{ github.sha }}
-
-    # --------------------------------------------------------
-    # Step 4: Deploy to KTH Cloud
-    # --------------------------------------------------------
-    - name: Set up Kubeconfig
-      run: |
-        mkdir -p ~/.kube
-        echo "${{ secrets.KTH_KUBECONFIG }}" > ~/.kube/config
-
-    - name: Trigger KTH Cloud Deployment
-      run: |
-        kubectl rollout restart deployment/vc_about_me
