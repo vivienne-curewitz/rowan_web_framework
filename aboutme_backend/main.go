@@ -27,14 +27,29 @@ type IPInfo struct {
 	Count     int
 }
 
-var IPList map[string]IPInfo
-
-func writeIpInfoToDB() {
+func writeIPInfoToDB() {
 	log.Println("Writing DB Info")
 	return
 }
 
-func insertIpDataLoop(ipChan chan string) {
+func insertIPInfo(remoteIP string, IPList map[string]IPInfo) {
+	log.Printf("Logging IP: %s\n", remoteIP)
+	ipInfo, exists := IPList[remoteIP]
+	if exists {
+		ipInfo.Count += 1
+		IPList[remoteIP] = ipInfo
+	} else {
+		ipInfo := IPInfo{
+			IPAddress: remoteIP,
+			Count:     1,
+		}
+		IPList[remoteIP] = ipInfo
+	}
+}
+
+func insertIPDataLoop(ipChan chan string) {
+	var IPList map[string]IPInfo
+	IPList = make(map[string]IPInfo)
 	dbWriteTicker := time.NewTicker(5 * time.Second)
 	for {
 		select {
@@ -43,30 +58,21 @@ func insertIpDataLoop(ipChan chan string) {
 				dbWriteTicker.Stop()
 				return
 			}
-			ipInfo, exists := IPList[remote]
-			if exists {
-				ipInfo.Count += 1
-				IPList[remote] = ipInfo
-			} else {
-				ipInfo := IPInfo{
-					IPAddress: remote,
-					Count:     1,
-				}
-				IPList[remote] = ipInfo
-			}
+			insertIPInfo(remote, IPList)
 		case <-dbWriteTicker.C:
 			// write to database
-			writeIpInfoToDB()
+			writeIPInfoToDB()
 		}
 	}
 }
 
 // the only handler we need for now
-func getHandler(public fs.FS) http.Handler {
+func getHandler(public fs.FS, remoteIPChan chan string) http.Handler {
 	fileServer := http.FileServer(http.FS(public))
 
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		// Clean the path to prevent directory traversal
+		remoteIPChan <- r.RemoteAddr
 		p := path.Clean(r.URL.Path)
 		if p == "/" {
 			p = "index.html"
@@ -102,10 +108,10 @@ func getHandler(public fs.FS) http.Handler {
 }
 
 func main() {
-	public := getFileSystem()
-	handler := getHandler(public)
 	remoteIPChan := make(chan string)
-	go insertIpDataLoop(remoteIPChan)
+	public := getFileSystem()
+	handler := getHandler(public, remoteIPChan)
+	go insertIPDataLoop(remoteIPChan)
 
 	port := os.Getenv("PORT")
 	if port == "" {
