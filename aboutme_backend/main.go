@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"os"
 	"path"
+	"time"
 )
 
 //go:embed all:frontend/dist
@@ -20,6 +21,47 @@ func getFileSystem() fs.FS {
 	return public
 }
 
+// ip tracking stuff here
+type IPInfo struct {
+	IPAddress string
+	Count     int
+}
+
+var IPList map[string]IPInfo
+
+func writeIpInfoToDB() {
+	log.Println("Writing DB Info")
+	return
+}
+
+func insertIpDataLoop(ipChan chan string) {
+	dbWriteTicker := time.NewTicker(5 * time.Second)
+	for {
+		select {
+		case remote, ok := <-ipChan:
+			if !ok {
+				dbWriteTicker.Stop()
+				return
+			}
+			ipInfo, exists := IPList[remote]
+			if exists {
+				ipInfo.Count += 1
+				IPList[remote] = ipInfo
+			} else {
+				ipInfo := IPInfo{
+					IPAddress: remote,
+					Count:     1,
+				}
+				IPList[remote] = ipInfo
+			}
+		case <-dbWriteTicker.C:
+			// write to database
+			writeIpInfoToDB()
+		}
+	}
+}
+
+// the only handler we need for now
 func getHandler(public fs.FS) http.Handler {
 	fileServer := http.FileServer(http.FS(public))
 
@@ -48,7 +90,7 @@ func getHandler(public fs.FS) http.Handler {
 		// but only if it doesn't look like a static asset (to avoid weird errors)
 		// Or just always serve index.html for SPA as is common.
 		// We'll stick to serving index.html but ensure it exists.
-		
+
 		if _, err := public.Open("index.html"); err == nil {
 			r.URL.Path = "/"
 			fileServer.ServeHTTP(w, r)
@@ -62,6 +104,8 @@ func getHandler(public fs.FS) http.Handler {
 func main() {
 	public := getFileSystem()
 	handler := getHandler(public)
+	remoteIPChan := make(chan string)
+	go insertIpDataLoop(remoteIPChan)
 
 	port := os.Getenv("PORT")
 	if port == "" {
