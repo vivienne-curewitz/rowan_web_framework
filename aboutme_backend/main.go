@@ -1,9 +1,13 @@
 package main
 
 import (
+	"crypto/sha256"
 	"embed"
+	"encoding/json"
+	"fmt"
 	"io/fs"
 	"log"
+	"net"
 	"net/http"
 	"os"
 	"path"
@@ -27,23 +31,52 @@ type IPInfo struct {
 	Count     int
 }
 
+type IPGeoLocation struct {
+	Lat     float64
+	Lon     float64
+	City    string
+	Country string
+}
+
+// http://ip-api.com/json/24.48.0.1
+func queryIPGeolocation(ip string) (IPGeoLocation, error) {
+	url := fmt.Sprintf("http://ip-api.com/json/%s", ip)
+	resp, err := http.Get(url)
+	if err != nil {
+		return IPGeoLocation{}, err
+	}
+	defer resp.Body.Close()
+
+	var location IPGeoLocation
+	if err := json.NewDecoder(resp.Body).Decode(&location); err != nil {
+		return IPGeoLocation{}, err
+	}
+	return location, nil
+}
+
 func writeIPInfoToDB() {
 	log.Println("Writing DB Info")
 	return
 }
 
 func insertIPInfo(remoteIP string, IPList map[string]IPInfo) {
+	host, _, err := net.SplitHostPort(remoteIP)
+	if err == nil {
+		host = remoteIP
+	}
 	log.Printf("Logging IP: %s\n", remoteIP)
-	ipInfo, exists := IPList[remoteIP]
+	hash := sha256.Sum256([]byte(host))
+	ipKey := fmt.Sprintf("%x", hash)
+	ipInfo, exists := IPList[ipKey]
 	if exists {
 		ipInfo.Count += 1
-		IPList[remoteIP] = ipInfo
+		IPList[ipKey] = ipInfo
 	} else {
 		ipInfo := IPInfo{
-			IPAddress: remoteIP,
+			IPAddress: ipKey,
 			Count:     1,
 		}
-		IPList[remoteIP] = ipInfo
+		IPList[ipKey] = ipInfo
 	}
 }
 
