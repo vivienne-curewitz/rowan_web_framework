@@ -9,7 +9,12 @@ import (
 
 func TestServerHandler(t *testing.T) {
 	public := getFileSystem()
-	handler := getHandler(public)
+	remoteIPChan := make(chan string, 100)
+	go func() {
+		for range remoteIPChan {
+		}
+	}()
+	handler := getHandler(public, remoteIPChan)
 
 	tests := []struct {
 		name           string
